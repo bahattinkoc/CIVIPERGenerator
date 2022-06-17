@@ -57,16 +57,21 @@ func fileComment(for module: String, type: String) -> String {
 let interfaceRouter = """
 \(fileComment(for: prefix, type: "Router"))
 
-import Foundation
 import UIKit
 
-protocol \(prefix)RouterInterface: class {
+//MARK: - PROTOCOLS
+protocol \(prefix)RouterProtocol: AnyObject {
 
 }
 
-class \(prefix)Router: NSObject {
+//MARK: - ENUMS
+enum \(prefix)Routes {
 
-    weak var presenter: \(prefix)PresenterInterface?
+}
+
+final class \(prefix)Router {
+
+    weak var presenter: \(prefix)PresenterProtocol?
 
     static func setupModule() -> \(prefix)ViewController {
         let vc = \(prefix)ViewController()
@@ -81,11 +86,9 @@ class \(prefix)Router: NSObject {
     }
 }
 
-extension \(prefix)Router: \(prefix)RouterInterface {
+extension \(prefix)Router: \(prefix)RouterProtocol {
 
 }
-
-
 """
 
 let interfacePresenter = """
@@ -93,24 +96,29 @@ let interfacePresenter = """
 
 import Foundation
 
-protocol \(prefix)PresenterInterface: class {
+//MARK: - PROTOCOLS
+protocol \(prefix)PresenterProtocol: AnyObject {
 
 }
 
-class \(prefix)Presenter {
+final class \(prefix)Presenter {
 
-    unowned var view: \(prefix)ViewControllerInterface
-    let router: \(prefix)RouterInterface?
-    let interactor: \(prefix)InteractorInterface?
+    unowned var view: \(prefix)ViewControllerProtocol
+    let router: \(prefix)RouterProtocol?
+    let interactor: \(prefix)InteractorProtocol?
 
-    init(interactor: \(prefix)InteractorInterface, router: \(prefix)RouterInterface, view: \(prefix)ViewControllerInterface) {
+    init(interactor: \(prefix)InteractorProtocol, router: \(prefix)RouterProtocol, view: \(prefix)ViewControllerProtocol) {
         self.view = view
         self.interactor = interactor
         self.router = router
     }
 }
 
-extension \(prefix)Presenter: \(prefix)PresenterInterface {
+extension \(prefix)Presenter: \(prefix)PresenterProtocol {
+
+}
+
+extension \(prefix)Presenter: \(prefix)InteractorOutputProtocol {
 
 }
 
@@ -121,15 +129,19 @@ let interfaceViewController = """
 
 import UIKit
 
-protocol \(prefix)ViewControllerInterface: class {
+protocol \(prefix)ViewControllerProtocol: AnyObject {
 
 }
 
-class \(prefix)ViewController: UIViewController {
-    var presenter: \(prefix)PresenterInterface?
+final class \(prefix)ViewController: UIViewController {
+    var presenter: \(prefix)PresenterProtocol?
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+    }
 }
 
-extension \(prefix)ViewController: \(prefix)ViewControllerInterface {
+extension \(prefix)ViewController: \(prefix)ViewControllerProtocol {
 
 }
 
@@ -140,15 +152,19 @@ let interfaceInteractor = """
 
 import Foundation
 
-protocol \(prefix)InteractorInterface: class {
+protocol \(prefix)InteractorProtocol: AnyObject {
 
 }
 
-class \(prefix)Interactor {
-    weak var presenter: \(prefix)PresenterInterface?
+protocol \(prefix)InteractorOutputProtocol: AnyObject {
+
 }
 
-extension \(prefix)Interactor: \(prefix)InteractorInterface {
+final class \(prefix)Interactor {
+    weak var presenter: \(prefix)PresenterProtocol?
+}
+
+extension \(prefix)Interactor: \(prefix)InteractorProtocol {
 
 }
 
